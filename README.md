@@ -24,7 +24,9 @@ All examples in this dictionary are using [Sinon.JS](https://sinonjs.org/) as a 
 
 ### Unit tests
 
+**Important!**
 
+Most of the points below are possible to fulfil when writing new code. Unit testing of existing code is a totally different beast and it won't be covered in this tutorial.
 
 **Characteristics**:
 
@@ -34,6 +36,7 @@ aka. The Truth
 * every run gives **exactly the same result** if the code didn't change
 * can be run fast and often, e.g. as background watcher on every file modification
 * execution and checking results (pass/fail) are automatic, in other words, can be done with (best-case scenario) one command
+* they are isolated from eachother, so one none of the tests is changing the state of environment, which means in practice that developer can skip/move/delete any test case and none of other tests will be affected by this action
 * they are **not substituting** other types of tests
 * they **do not test the contract** between tested modules
 
@@ -45,33 +48,40 @@ aka. You Should Accept This as Truth if you don't want to reinvent the wheel
 * are good documentation - are readable (clean code) and informative for developers (well described with proper variable names)
 * highest possible coverage (100% is practically unachievable in big systems, everything above 85% is a good score)
 * one expect per unit test
+* red-green principle for writing tests
 * expect matches test description
-* unit tests code quality and the amount should be at least as high as production code, but having on mind that those tests can (and should) be used as documentation, quality should be even higher and more strict than production code
+* unit tests code quality should be at least as high as production code, but please keep in mind that purpose of unit tests is documentation and readability, so there is no need to e.g. making them super DRY and move everything to constants and functions
+* amount of testing code in most cases should be equal or higher than production code
+* before fixing any bug, write an unit test that exposes it
+
 
 **My personal list of rules of thumb**:
 
 aka. You Can Critically Consider This as Truth, because it's authors opinion about JavaScript unit tests good practices, based on his experience
 
-* based on unit tests developer is able to write from scratch (or refactor existing code) any part of the system (all `rules-of-thumb/` examples combined)
-* write tests first, because that will force you to e.g. write testable code, use dependency injection, etc. (all `rules-of-thumb/` examples combined)
+* based on unit tests developer is able to write from scratch (or refactor existing code) any part of the system
+* write tests first, because that will force you to e.g. write testable code, use dependency injection, etc.
 * every `if()` in the code generates two test cases - see [examples](rules-of-thumb/every-if-two-test-cases.test.js)
+* focus on covering meaningful edge cases instead of writing happy-paths for a proper, but random value - see [examples](rules-of-thumb/edge-cases-coverage.test.js)
 * descriptions of failing test should combine a valuable and understandable sentence for the developer - see [examples](rules-of-thumb/informative-descriptions.test.js)
 * unit tests should catch any logic mutation - see [examples](rules-of-thumb/logic-mutation.test.js)
-* write stubs (see [examples](rules-of-thumb/stubs.test.js)) with an additional test case for failure if the tested module uses:
+* write stubs (see [examples](rules-of-thumb/stubs.test.js)) **with an additional test case for failure** if the tested module uses:
     * any asynchronous method
     * any request (especially the one outside of your control - separate service, etc.)
     * any third-party library method that in your opinion might do any of above
 * use multiple nested describe blocks to at least separate tested methods
 * do not use apostrophes ( `'` ), quotes ( `"` ) or other chars (`!`, `/`, `?`, `\`, etc.) that might have to be escaped in search - that will simplify developer's life to simply copy-paste last part of failing test name to random search, example: instead of `"don't throw when app's running"`, write `"do not throw when app is running"`
 * testing time-related behavior (e.g. timeouts of requests, triggering with a delay) should be written in a way that does not impact tests execution time (e.g. by custom configuration) and ensures same execution on each run, [examples](rules-of-thumb/time-events.test.js)
+* do not fake/mock global methods/objects like `Date`, `fs`, etc.
 
-**Nomans Land**:
+
+**No man's Land**:
 
 aka. You Have To Figure That Out per Project:
 
 * how to handle the faked modules API
 * what should be abstracted to test helpers
-* ...
+* how to write tests to existing code
 
 ---
 

@@ -39,18 +39,15 @@ describe('Kiosk class', () => {
         bubbleGums: 1,
       });
 
-      expect(() => {
-        kiosk.getBubbleGum(); // 1 gum
-        kiosk.getBubbleGum(); // should throw
-      }).toThrow();
+      kiosk.getBubbleGum(); // 1 gum that is passed in init object (line above)
+
+      expect(kiosk.getBubbleGum).toThrow();
     });
 
     it('will throw if no bubblegums where initialized', () => {
       const kiosk = new Kiosk();
 
-      expect(() => {
-        kiosk.getBubbleGum(); // should throw
-      }).toThrow();
+      expect(kiosk.getBubbleGum).toThrow();
     });
 
     it('does not modify passed initial state', () => {

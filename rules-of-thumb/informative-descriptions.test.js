@@ -19,6 +19,7 @@ class Kiosk {
  */
 
 describe('Kiosk class', () => {
+  // describe('has proper methods', () => { // BAD EXAMPLE
   describe('has method getBubbleGum()', () => {
     it('exposed', () => {
       const kiosk = new Kiosk();

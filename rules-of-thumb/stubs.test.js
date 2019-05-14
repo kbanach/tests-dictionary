@@ -26,7 +26,7 @@ class WebCrawler {
       callsLeft--;
 
       try {
-        const body =  await this.getMethod(url);
+        const body = await this.getMethod(url);
         return body;
       } catch(err) {
         if (callsLeft <= 0) {
@@ -52,6 +52,7 @@ describe('WebCrawler class', () => {
       }).toThrow();
     });
 
+    // it('does not throw with proper param', () => { // BAD EXAMPLE
     it('should not throw when passed argument is a function', () => {
       expect(() => {
         new WebCrawler(function (){});
@@ -89,7 +90,7 @@ describe('WebCrawler class', () => {
         .resolves.toBeTruthy();
     });
 
-    it('retries three times to fetch in case of GET method failure', async () => {
+    it('tries four times (three retires) to fetch in case of GET method failure', async () => {
       STUB_FETCH
         .onCall(0).throws()
         .onCall(1).throws()
