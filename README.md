@@ -12,15 +12,99 @@ All examples in this dictionary are using [Sinon.JS](https://sinonjs.org/) as a 
     1. [Integration tests](#integration-tests)
     1. [Acceptance tests](#acceptance-tests)
 1. [Dictionary](#dictionary)
+    1. [Happy-path](#happy-path)
+    1. [Edge case](#edge-case)
     1. [Coverage](#coverage)
     1. [Spies](#spies)
     1. [Stubs](#stubs)
     1. [Mocks](#mocks)
-    1. [Assertions](#assertions)
+    1. [Assertions](#assertions-expects)
+1. [Tools](#tools)
 
 ---
 
 ## Theory
+
+There are two kinds of developers:
+
+* developers who write automated tests
+* developers who will hit hard fail because of lack of tests and they will start to write automated tests
+
+There are three reasons why writing tests is beneficial:
+
+* ability make random code changes (aka. "refactor") and be sure, as long as the tests pass, that it didn't break any other part of the system
+* productivity boost - no time is wasted on running manual tests over and over again
+* actual documentation what production code meant to do and does it still doing that (on each run of automated tests)
+
+Cons of writing tests:
+
+* bad tests introduce more pain than gain (maintenance of badly designed tests consumes more time than production code change)
+* they require more discipline than production code (to avoid issue mentioned above)
+* introduction of maintainable tests to existing production code is as pleasant as reaching 8th Ring of Hell (9th Ring is entirely booked by devs who don't write tests and leave the company)
+
+People don't want to write tests because of lack of knowledge to answer those questions:
+
+* how to write tests?
+* how I can save time by spending time on writing tests?
+* where to find time on writing tests?
+
+
+### How to write tests?
+
+Short answer: before writing production code.
+
+Long answer: It depends on level of experience.
+**Beginner** should be instructed to write any kind of tests cases in exsiting framework and every line he creates should be revieved by someone who have knowledge about general good practices, used frameworks and implemented custom solutions per project. **Intermediate** should write as much as possible BDD/TDD (depends on which is used by team) for unit tests and acceptance tests. **Experienced developer** should care about tests code review, maintain the testing framework, spread good practices and share as much knowledge about tests as he phisically can (e.g. by pair-programming).
+
+
+### How I can save time by spending time on writing tests?
+
+This one is quite tricky. On the first glance writing automated test may seem to be a waste of time:
+
+* there is literally no working production code that brings value to the client (aka. business value)
+* tests are another piece of code to maintain
+* setup working testing framework that is clean and doesn't require any introduction to rest of devs is difficult if not impossible
+
+**BUT!**, all of above issues are a copy-pasted complains if anyone tries to introduce any random framework to the team. Having said that, nobody questions using a framework for any app that lifecycle is longer than two sprints and involves more than two developers.
+
+So, in general, writing and using automated tests might be considered as investment of time now (when there is no time), to spend less time in the future on bug-fixing,  introducing new features and refactoring huge chunks of application (when there will be even less time + production is down + logging system is not working + devops aren't available + official release is delayed two times already + your app was written by five teams, including monkeys on drugs).
+
+
+### Where to find time on writing tests?
+
+Short answer: as a professional, you know writing tests is part of development of any bug-fix or new feature. Period.
+
+Long answer: as a professional, you know writing tests is part of development of any bug-fix or new feature. Period. Consider them in estimates and add existence of automated test cases as required part of any code review.
+
+## Why to unit/integration/acceptance tests?
+
+Difference between them can be shorten to some characteristics:
+
+Unit tests:
+* white box tests, heavily integrated with current production code implementation, used framework and libraries
+* basic documentation tool for other developers, that answers the question "how to use module you've just written?"
+* don't rely on any DB, service, whatsoever working in background (basically you should be able to run them locally offline)
+* pinpoint where the issue is in case of failure
+* in case of pass, developers know that they didn't break someone's else's code
+* cheap to setup, write and maintain
+
+Integration tests:
+* testing of single features provided by some parts of system working together
+* might require using some "hacks" to be able to put/read/remove stuff from DB or other sources of data
+* may require running DB, have access to Internet or other services running on the same machine
+* their failure is informing that "there's some issue with this feature, it should be somewhere starting from here: ModuleXYZ.abc()" and it might mean anything
+* gives an overview that developer break some essential feature in case of failure (but to be sure, should be run once more)
+* gives certainty that main most features are working as before (but still kind of independently from eachother)
+* expensive to setup, cheap to write, average to maintain
+
+
+Acceptance tests (aka. E2E tests):
+* black box tests, that interact with the system as end-consumer would (e.g. by webbrowser, hitting API endpoints with proper requests, etc.)
+* their failure might be totally random, due to network issues, other processes running on same machine, weird data in DB
+* gives a tip that something changed in user experience - it requires deeper look
+* gives certainty that from user perspective system is behaving "as before"
+* expensive to setup, average to write, expensive to maintain
+
 
 ### Unit tests
 
@@ -65,14 +149,14 @@ aka. You Can Critically Consider This as Truth, because it's authors opinion abo
 * focus on covering meaningful edge cases instead of writing happy-paths for a proper, but random value - see [examples](rules-of-thumb/edge-cases-coverage.test.js)
 * descriptions of failing test should combine a valuable and understandable sentence for the developer - see [examples](rules-of-thumb/informative-descriptions.test.js)
 * unit tests should catch any logic mutation - see [examples](rules-of-thumb/logic-mutation.test.js)
-* write stubs (see [examples](rules-of-thumb/stubs.test.js)) **with an additional test case for failure** if the tested module uses:
+* write stubs **with an additional test case for failure** (see [examples](rules-of-thumb/stubs.test.js)) if the tested module uses:
     * any asynchronous method
     * any request (especially the one outside of your control - separate service, etc.)
     * any third-party library method that in your opinion might do any of above
 * use multiple nested describe blocks to at least separate tested methods
 * do not use apostrophes ( `'` ), quotes ( `"` ) or other chars (`!`, `/`, `?`, `\`, etc.) that might have to be escaped in search - that will simplify developer's life to simply copy-paste last part of failing test name to random search, example: instead of `"don't throw when app's running"`, write `"do not throw when app is running"`
 * testing time-related behavior (e.g. timeouts of requests, triggering with a delay) should be written in a way that does not impact tests execution time (e.g. by custom configuration) and ensures same execution on each run, [examples](rules-of-thumb/time-events.test.js)
-* do not fake/mock global methods/objects like `Date`, `fs`, etc.
+* do not fake/mock global methods/objects like `Date`, `fs`, etc., because in case of a stupid mistake (forget to de-fake it) might bring unpredictable behavior of other tests (e.g. tests that suppose to fail, will now pass)
 
 
 **No man's Land**:
@@ -87,22 +171,27 @@ aka. You Have To Figure That Out per Project:
 
 ### Integration tests
 
-#### Long story
+**Long story**:
+While unit tests are independently checking the behavior of single methods, integration tests are making sure that those single methods works fine togeather to deliver a specific functionality of the system. It doesn't have to be executed fast and often automagically, but can be triggered by test team, build half of universe upfront and fail randomly because of phase of the moon. They are hard to debug, expensive in maintenance but in case they pass, you can be certain that implemented features are still able to do their job. They are equally valuable for developers as for the end users.
 
 
 
-#### TL;DR
+**TL;DR**:
 Everything that violates at least one of the points of Unit Tests Characteristics is a most probably an integration test.
-
 
 ---
 
 ### Acceptance tests
 
+The most important tests from perspective of user. They use only the interfaces available to the end user, thus they kind check so called user experience with the system. If something slows down, some DB is down, some integrated service misbehaves, they will most probably fail. You can consider it as measurement of level of frustration of system's end user.
+
 ---
 
 ## Dictionary
 
+### Happy-path
+
+### Edge case (in testing)
 
 ### Coverage
 
@@ -257,7 +346,40 @@ use the mock in unit tests in a particular way.
 #### Examples
 
 ```javascript
-test();
+test('getPdf() method is calling PDF library with A4 format and passed content ', () => {
+  const pdfAPI = { htmlToPdf: function() {} };
+  const pdfLibMock = sinon.mock(pdfAPI);
+
+  pdfLibMock.withArgs('a4', /SAMPLE TEST INPUT/ig);
+
+  const INPUT = 'SAMPLE TEST INPUT';
+
+  testedObj.getPdf(INPUT);
+
+  mock.verify();
+  expect(mock).to.have.been.calledOnce;
+});
 ```
 
 ### Assertions/expects
+
+Those are simple methods provided by framework that verify given value. If given value does not match expected result (both are given per call), it throws. Some of them, like `expect` are quite self-explandatory or a bit less, like `assert`:
+
+```javascript
+// Jest's expect - https://github.com/mjackson/expect
+expect(true).toExists(); // won't throw
+excpect(false).toBe(true); // throws
+excpect(false).toBe(true); // throws
+
+// NodeJS assert - https://nodejs.org/api/assert.html
+assert(true); // won't throw
+assert.notStrictEqual(1, '1'); // won't throw
+assert(false); // throws
+assert.ok(typeof 123 === 'string'); // throws
+```
+
+---
+
+## Tools
+
+> DIFFERENCES BETWEEN ASSERTIONS LIBRARIES AND TESTS RUNNERS (+EXAMPLES)

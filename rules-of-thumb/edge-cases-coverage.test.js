@@ -88,6 +88,11 @@ describe('Kiosk class', () => {
       }).toThrow(/DIGITS/ig);
     });
 
+    // // useless happy-path test with proper but random (far away from edge-case) value
+    // it('adds 0% to price below 10', () => {
+    //   expect(Kiosk.addTax('5.00')).toBe('5.00');
+    // });
+
     it('adds 0% to price below 10', () => {
       expect(Kiosk.addTax('9.99')).toBe('9.99');
     });
