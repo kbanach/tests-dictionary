@@ -27,14 +27,14 @@ All examples in this dictionary are using [Sinon.JS](https://sinonjs.org/) as a 
 
 There are two kinds of developers:
 
-* developers who write automated tests
-* developers who will hit hard fail because of lack of tests and they will start to write automated tests
+* those who write automated tests
+* those who will hit hard fail because of lack of tests and they will start to write automated tests
 
 There are three reasons why writing tests is beneficial:
 
-* ability make random code changes (aka. "refactor") and be sure, as long as the tests pass, that it didn't break any other part of the system
+* ability to make random code changes (aka. "refactor") and be sure, as long as the tests pass, that it didn't break any other part of the system
 * productivity boost - no time is wasted on running manual tests over and over again
-* actual documentation what production code meant to do and does it still doing that (on each run of automated tests)
+* actual documentation what production code meant to do and does it still do that (on each run of automated tests)
 
 Cons of writing tests:
 
@@ -76,7 +76,7 @@ Short answer: as a professional, you know writing tests is part of development o
 
 Long answer: as a professional, you know writing tests is part of development of any bug-fix or new feature. Period. Consider them in estimates and add existence of automated test cases as required part of any code review.
 
-## Why to unit/integration/acceptance tests?
+## What is unit/integration/acceptance tests?
 
 Difference between them can be shorten to some characteristics:
 
@@ -85,7 +85,7 @@ Unit tests:
 * basic documentation tool for other developers, that answers the question "how to use module you've just written?"
 * don't rely on any DB, service, whatsoever working in background (basically you should be able to run them locally offline)
 * pinpoint where the issue is in case of failure
-* in case of pass, developers know that they didn't break someone's else's code
+* in case of pass, developers know that they didn't break someone's else's code behavior (aka. methods still have the same output and impact on system)
 * cheap to setup, write and maintain
 
 Integration tests:
@@ -101,7 +101,7 @@ Integration tests:
 Acceptance tests (aka. E2E tests):
 * black box tests, that interact with the system as end-consumer would (e.g. by webbrowser, hitting API endpoints with proper requests, etc.)
 * their failure might be totally random, due to network issues, other processes running on same machine, weird data in DB
-* gives a tip that something changed in user experience - it requires deeper look
+* gives a tip that something changed in user experience - it requires a deeper look
 * gives certainty that from user perspective system is behaving "as before"
 * expensive to setup, average to write, expensive to maintain
 
@@ -378,8 +378,84 @@ assert(false); // throws
 assert.ok(typeof 123 === 'string'); // throws
 ```
 
----
+### Test runners
 
-## Tools
+Those are libraries that expose methods and commands that help to write tests. Let's use an example of vanilla JS script:
 
-> DIFFERENCES BETWEEN ASSERTIONS LIBRARIES AND TESTS RUNNERS (+EXAMPLES)
+```javascript
+/// The Method
+function sum(...args) {
+  let output = 0;
+
+  if (args.length === 0) {
+    throw new Error('Method needs at least one number input');
+  }
+
+  for (const a of args) {
+    output += a;
+  }
+
+  return output;
+}
+
+// The Tests
+
+if (sum(1) !== 1) {
+  throw new Error('Method sum() should return 1 for input of 1');
+}
+
+if (sum(1, 2) !== 3) {
+  throw new Error('Method sum() should return 3 for input of 1 and 3');
+}
+
+if (sum(1, -1) !== 0) {
+  throw new Error('Method sum() should be able to handle negative numbers by subtracting them from sum');
+}
+
+try {
+  sum();
+} catch(err) {
+  if (!/INPUT/ig.test(err.message)) {
+    throw new Error('Method sum() should throw an error mentioning INPUT when no parameters where passed');
+  }
+}
+
+// ...
+
+```
+
+And with Jest/Expect:
+
+```javascript
+/// The Method
+// ...
+
+// The Tests
+
+describe('Method sum() should', () => {
+  test('return 1 for input of 1', () => {
+    expect(sum(1)).toBe(1);
+  });
+
+  test('return 3 for input of 1 and 3', () => {
+    expect(sum(1, 2)).toBe(3);
+  });
+
+  test('be able to handle negative numbers by subtracting them from sum', () => {
+    expect(sum(1, -1)).toBe(0);
+  });
+
+  test('throw an error mentioning INPUT when no parameters where passed', () => {
+    expect(() => {
+      sum();
+    }).toThrow(/INPUT/ig);
+  });
+});
+
+
+
+// ...
+
+```
+
+There is no difference in simple examples, but it's starting to get complicated in vanilla JS when examples are getting more complex, because most test runners expose helper methods like `describe`, `test`, `beforeEach`, etc. that make writing tests easier and more readable.
