@@ -10,7 +10,7 @@ All examples in this dictionary are using [Sinon.JS](https://sinonjs.org/) as a 
 1. [Theory](#theory)
     1. [How to write tests](#how-to-write-tests)
     1. [How I can save time by spending time on writing tests](#how-i-can-save-time-by-spending-time-on-writing-tests)
-1. [What are unit/integration/E2E tests](#what-are-unit-integration-e2e-tests)
+1. [What are unit/integration/E2E tests](#what-are-unitintegratione2e-tests)
     1. [Unit tests](#unit-tests)
     1. [Integration tests](#integration-tests)
     1. [E2E tests](#E2E-tests)
@@ -101,7 +101,7 @@ Integration tests:
 * expensive to setup, cheap to write, average to maintain
 
 
-E2E tests (aka. E2E tests):
+E2E tests:
 * black-box tests, that interact with the system as end-consumer would (e.g. by a web browser, hitting API endpoints with proper requests, etc.)
 * their failure might be totally random, due to network issues, other processes running on the same machine, weird data in DB
 * gives a tip that something changed in user experience - it requires a deeper look
@@ -200,9 +200,112 @@ Name for a default testing scenario that doesn't cover edge-cases or error condi
 
 In the context of testing, it means a scenario on which behavior of method changes, e.g. if tax changes for everything above $10 in some method, then you'll have 3 edge case scenarios: $9.99, $10.00 and $10.01.
 
+### Assertions/expects
+
+Those are simple methods provided by framework that verify given value. If given value does not match expected result (both are given per call), it throws. Some of them, like `expect` are quite self-explandatory or a bit less, like `assert`:
+
+```javascript
+// Jest's expect - https://github.com/mjackson/expect
+expect(true).toExists(); // won't throw
+excpect(false).toBe(true); // throws
+excpect(false).toBe(true); // throws
+
+// NodeJS assert - https://nodejs.org/api/assert.html
+assert(true); // won't throw
+assert.notStrictEqual(1, '1'); // won't throw
+assert(false); // throws
+assert.ok(typeof 123 === 'string'); // throws
+```
+
+### Test runners
+
+Those are libraries that expose methods and commands that help to write tests. Let's use an example of vanilla JS script:
+
+```javascript
+/// The Method
+function sum(...args) {
+  let output = 0;
+
+  if (args.length === 0) {
+    throw new Error('Method needs at least one number input');
+  }
+
+  for (const a of args) {
+    output += a;
+  }
+
+  return output;
+}
+```
+
+```javascript
+// The Tests
+
+if (sum(1) !== 1) {
+  throw new Error('Method sum() should return 1 for input of 1');
+}
+
+if (sum(1, 2) !== 3) {
+  throw new Error('Method sum() should return 3 for input of 1 and 3');
+}
+
+if (sum(1, -1) !== 0) {
+  throw new Error('Method sum() should be able to handle negative numbers by subtracting them from sum');
+}
+
+try {
+  sum();
+} catch(err) {
+  if (!/INPUT/ig.test(err.message)) {
+    throw new Error('Method sum() should throw an error mentioning INPUT when no parameters where passed');
+  }
+}
+
+// ...
+
+```
+
+And with Jest/Expect:
+
+```javascript
+/// The Method
+// ...
+
+// The Tests
+
+describe('Method sum() should', () => {
+  test('return 1 for input of 1', () => {
+    expect(sum(1)).toBe(1);
+  });
+
+  test('return 3 for input of 1 and 3', () => {
+    expect(sum(1, 2)).toBe(3);
+  });
+
+  test('be able to handle negative numbers by subtracting them from sum', () => {
+    expect(sum(1, -1)).toBe(0);
+  });
+
+  test('throw an error mentioning INPUT when no parameters where passed', () => {
+    expect(() => {
+      sum();
+    }).toThrow(/INPUT/ig);
+  });
+});
+
+
+
+// ...
+
+```
+
+There is no difference in simple examples, but it's starting to get complicated in vanilla JS when examples are getting more complex because most test runners expose helper methods like `describe`, `test`, `beforeEach`, etc. that make writing tests easier and more readable.
+
+
 ### Coverage
 
 The easiest way of understanding "coverage" is how many lines of the production code were "touched"/executed during tests.
+
 
 ### Spies
 
@@ -369,104 +472,3 @@ test('getPdf() method is calling PDF library with A4 format and passed content '
   expect(mock).to.have.been.calledOnce;
 });
 ```
-
-### Assertions/expects
-
-Those are simple methods provided by framework that verify given value. If given value does not match expected result (both are given per call), it throws. Some of them, like `expect` are quite self-explandatory or a bit less, like `assert`:
-
-```javascript
-// Jest's expect - https://github.com/mjackson/expect
-expect(true).toExists(); // won't throw
-excpect(false).toBe(true); // throws
-excpect(false).toBe(true); // throws
-
-// NodeJS assert - https://nodejs.org/api/assert.html
-assert(true); // won't throw
-assert.notStrictEqual(1, '1'); // won't throw
-assert(false); // throws
-assert.ok(typeof 123 === 'string'); // throws
-```
-
-### Test runners
-
-Those are libraries that expose methods and commands that help to write tests. Let's use an example of vanilla JS script:
-
-```javascript
-/// The Method
-function sum(...args) {
-  let output = 0;
-
-  if (args.length === 0) {
-    throw new Error('Method needs at least one number input');
-  }
-
-  for (const a of args) {
-    output += a;
-  }
-
-  return output;
-}
-```
-
-```javascript
-// The Tests
-
-if (sum(1) !== 1) {
-  throw new Error('Method sum() should return 1 for input of 1');
-}
-
-if (sum(1, 2) !== 3) {
-  throw new Error('Method sum() should return 3 for input of 1 and 3');
-}
-
-if (sum(1, -1) !== 0) {
-  throw new Error('Method sum() should be able to handle negative numbers by subtracting them from sum');
-}
-
-try {
-  sum();
-} catch(err) {
-  if (!/INPUT/ig.test(err.message)) {
-    throw new Error('Method sum() should throw an error mentioning INPUT when no parameters where passed');
-  }
-}
-
-// ...
-
-```
-
-And with Jest/Expect:
-
-```javascript
-/// The Method
-// ...
-
-// The Tests
-
-describe('Method sum() should', () => {
-  test('return 1 for input of 1', () => {
-    expect(sum(1)).toBe(1);
-  });
-
-  test('return 3 for input of 1 and 3', () => {
-    expect(sum(1, 2)).toBe(3);
-  });
-
-  test('be able to handle negative numbers by subtracting them from sum', () => {
-    expect(sum(1, -1)).toBe(0);
-  });
-
-  test('throw an error mentioning INPUT when no parameters where passed', () => {
-    expect(() => {
-      sum();
-    }).toThrow(/INPUT/ig);
-  });
-});
-
-
-
-// ...
-
-```
-
-There is no difference in simple examples, but it's starting to get complicated in vanilla JS when examples are getting more complex because most test runners expose helper methods like `describe`, `test`, `beforeEach`, etc. that make writing tests easier and more readable.
