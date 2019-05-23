@@ -1,16 +1,19 @@
 Testing dictionary
 ==================
 
-All examples in this dictionary are using [Sinon.JS](https://sinonjs.org/) as a testing library
+All examples in this dictionary are using [Sinon.JS](https://sinonjs.org/) as a testing library.
 
 ---
 
 ## Table of contents
 
 1. [Theory](#theory)
+    1. [How to write tests](#how-to-write-tests)
+    1. [How I can save time by spending time on writing tests](#how-i-can-save-time-by-spending-time-on-writing-tests)
+1. [What are unit/integration/E2E tests](#what-are-unit-integration-e2e-tests)
     1. [Unit tests](#unit-tests)
     1. [Integration tests](#integration-tests)
-    1. [Acceptance tests](#acceptance-tests)
+    1. [E2E tests](#E2E-tests)
 1. [Dictionary](#dictionary)
     1. [Happy-path](#happy-path)
     1. [Edge case](#edge-case)
@@ -53,8 +56,8 @@ People don't want to write tests because of lack of knowledge to answer those qu
 
 Short answer: before writing production code.
 
-Long answer: It depends on level of experience.
-**Beginner** should be instructed to write any kind of tests cases in exsiting framework and every line he creates should be revieved by someone who have knowledge about general good practices, used frameworks and implemented custom solutions per project. **Intermediate** should write as much as possible BDD/TDD (depends on which is used by team) for unit tests and acceptance tests. **Experienced developer** should care about tests code review, maintain the testing framework, spread good practices and share as much knowledge about tests as he phisically can (e.g. by pair-programming).
+Long answer: It depends on the level of experience.
+**Beginner** should be instructed to write any kind of tests cases in the existing framework and every line he creates should be reviewed by someone who has knowledge about general good practices, used frameworks and implemented custom solutions per project. **Intermediate** should write as much as possible BDD/TDD (depends on which is used by the team) for unit tests and E2E tests. **Experienced developer** should care about tests code review, maintain the testing framework, spread good practices and share as much knowledge about tests as he physically can (e.g. by pair-programming).
 
 
 ### How I can save time by spending time on writing tests?
@@ -67,42 +70,42 @@ This one is quite tricky. On the first glance writing automated test may seem to
 
 **BUT!**, all of above issues are a copy-pasted complains if anyone tries to introduce any random framework to the team. Having said that, nobody questions using a framework for any app that lifecycle is longer than two sprints and involves more than two developers.
 
-So, in general, writing and using automated tests might be considered as investment of time now (when there is no time), to spend less time in the future on bug-fixing,  introducing new features and refactoring huge chunks of application (when there will be even less time + production is down + logging system is not working + devops aren't available + official release is delayed two times already + your app was written by five teams, including monkeys on drugs).
+So, in general, writing and using automated tests might be considered an investment of time now (when there is no time), to spend less time in the future on bug-fixing,  introducing new features and refactoring huge chunks of application (when there will be even less time + production is down + logging system is not working + devops aren't available + official release is delayed two times already + your app was written by five teams, including monkeys on drugs).
 
 
 ### Where to find time on writing tests?
 
-Short answer: as a professional, you know writing tests is part of development of any bug-fix or new feature. Period.
+Short answer: as a professional, you know writing tests as part of the development of any bug-fix or new feature. Period.
 
-Long answer: as a professional, you know writing tests is part of development of any bug-fix or new feature. Period. Consider them in estimates and add existence of automated test cases as required part of any code review.
+Long answer: as a professional, you know writing tests as part of the development of any bug-fix or new feature. Period. Consider them in estimates and add the existence of automated test cases as a required part of any code review.
 
-## What is unit/integration/acceptance tests?
+## What are unit/integration/E2E tests?
 
-Difference between them can be shorten to some characteristics:
+Difference between them can be shortened to some characteristics:
 
 Unit tests:
-* white box tests, heavily integrated with current production code implementation, used framework and libraries
-* basic documentation tool for other developers, that answers the question "how to use module you've just written?"
-* don't rely on any DB, service, whatsoever working in background (basically you should be able to run them locally offline)
+* white box tests, heavily integrated with current production code implementation, used framework and libraries, **BUT** they don't exactly mirror the logic
+* basic documentation tool for other developers, that answers the question "how to use the module you've just written?"
+* don't rely on any DB, service, whatsoever working in the background (basically you should be able to run them locally offline)
 * pinpoint where the issue is in case of failure
-* in case of pass, developers know that they didn't break someone's else's code behavior (aka. methods still have the same output and impact on system)
+* in case of a pass, developers know that they didn't break someone's else's code behavior (aka. methods still have the same output and impact on system)
 * cheap to setup, write and maintain
 
 Integration tests:
 * testing of single features provided by some parts of system working together
 * might require using some "hacks" to be able to put/read/remove stuff from DB or other sources of data
-* may require running DB, have access to Internet or other services running on the same machine
+* may require running DB, have access to the Internet or other services running on the same machine
 * their failure is informing that "there's some issue with this feature, it should be somewhere starting from here: ModuleXYZ.abc()" and it might mean anything
 * gives an overview that developer break some essential feature in case of failure (but to be sure, should be run once more)
-* gives certainty that main most features are working as before (but still kind of independently from eachother)
+* gives certainty that main most features are working as before (but still kind of independently from each other)
 * expensive to setup, cheap to write, average to maintain
 
 
-Acceptance tests (aka. E2E tests):
-* black box tests, that interact with the system as end-consumer would (e.g. by webbrowser, hitting API endpoints with proper requests, etc.)
-* their failure might be totally random, due to network issues, other processes running on same machine, weird data in DB
+E2E tests (aka. E2E tests):
+* black-box tests, that interact with the system as end-consumer would (e.g. by a web browser, hitting API endpoints with proper requests, etc.)
+* their failure might be totally random, due to network issues, other processes running on the same machine, weird data in DB
 * gives a tip that something changed in user experience - it requires a deeper look
-* gives certainty that from user perspective system is behaving "as before"
+* gives certainty that from the user perspective system is behaving "as before"
 * expensive to setup, average to write, expensive to maintain
 
 
@@ -110,7 +113,7 @@ Acceptance tests (aka. E2E tests):
 
 **Important!**
 
-Most of the points below are possible to fulfil when writing new code. Unit testing of existing code is a totally different beast and it won't be covered in this tutorial.
+Most of the points below are possible to fulfill when writing new code. Unit testing of existing code is a totally different beast and it won't be covered in this tutorial.
 
 **Characteristics**:
 
@@ -120,7 +123,7 @@ aka. The Truth
 * every run gives **exactly the same result** if the code didn't change
 * can be run fast and often, e.g. as background watcher on every file modification
 * execution and checking results (pass/fail) are automatic, in other words, can be done with (best-case scenario) one command
-* they are isolated from eachother, so one none of the tests is changing the state of environment, which means in practice that developer can skip/move/delete any test case and none of other tests will be affected by this action
+* they are isolated from each other, so one none of the tests is changing the state of the environment, which means in practice that developer can skip/move/delete any test case and none of the other tests will be affected by this action
 * they are **not substituting** other types of tests
 * they **do not test the contract** between tested modules
 
@@ -136,7 +139,7 @@ aka. You Should Accept This as Truth if you don't want to reinvent the wheel
 * expect matches test description
 * unit tests code quality should be at least as high as production code, but please keep in mind that purpose of unit tests is documentation and readability, so there is no need to e.g. making them super DRY and move everything to constants and functions
 * amount of testing code in most cases should be equal or higher than production code
-* before fixing any bug, write an unit test that exposes it
+* before fixing any bug, write a unit test that exposes it
 
 
 **My personal list of rules of thumb**:
@@ -172,7 +175,7 @@ aka. You Have To Figure That Out per Project:
 ### Integration tests
 
 **Long story**:
-While unit tests are independently checking the behavior of single methods, integration tests are making sure that those single methods works fine togeather to deliver a specific functionality of the system. It doesn't have to be executed fast and often automagically, but can be triggered by test team, build half of universe upfront and fail randomly because of phase of the moon. They are hard to debug, expensive in maintenance but in case they pass, you can be certain that implemented features are still able to do their job. They are equally valuable for developers as for the end users.
+While unit tests are independently checking the behavior of single methods, integration tests are making sure that those single methods work fine together to deliver a specific functionality of the system. It doesn't have to be executed fast and often automagically, but can be triggered by the test team, build half of universe upfront and fail randomly because of the phase of moon. They are hard to debug, expensive in maintenance but in case they pass, you can be certain that implemented features are still able to do their job. They are equally valuable for developers as for the end users.
 
 
 
@@ -181,9 +184,9 @@ Everything that violates at least one of the points of Unit Tests Characteristic
 
 ---
 
-### Acceptance tests
+### E2E tests
 
-The most important tests from perspective of user. They use only the interfaces available to the end user, thus they kind check so called user experience with the system. If something slows down, some DB is down, some integrated service misbehaves, they will most probably fail. You can consider it as measurement of level of frustration of system's end user.
+The most important tests from the perspective of the user. They use only the interfaces available to the end user, thus they kind check so-called user experience with the system. If something slows down, some DB is down, some integrated service misbehaves, they will most probably fail. You can consider it as a measurement of the level of frustration of the system's end user.
 
 ---
 
@@ -191,9 +194,15 @@ The most important tests from perspective of user. They use only the interfaces 
 
 ### Happy-path
 
+Name for a default testing scenario that doesn't cover edge-cases or error conditions. It has widely known the input and expected output in the context of a tested system. You may consider it a low-effort test.
+
 ### Edge case (in testing)
 
+In the context of testing, it means a scenario on which behavior of method changes, e.g. if tax changes for everything above $10 in some method, then you'll have 3 edge case scenarios: $9.99, $10.00 and $10.01.
+
 ### Coverage
+
+The easiest way of understanding "coverage" is how many lines of the production code were "touched"/executed during tests.
 
 ### Spies
 
@@ -397,7 +406,9 @@ function sum(...args) {
 
   return output;
 }
+```
 
+```javascript
 // The Tests
 
 if (sum(1) !== 1) {
@@ -458,4 +469,4 @@ describe('Method sum() should', () => {
 
 ```
 
-There is no difference in simple examples, but it's starting to get complicated in vanilla JS when examples are getting more complex, because most test runners expose helper methods like `describe`, `test`, `beforeEach`, etc. that make writing tests easier and more readable.
+There is no difference in simple examples, but it's starting to get complicated in vanilla JS when examples are getting more complex because most test runners expose helper methods like `describe`, `test`, `beforeEach`, etc. that make writing tests easier and more readable.
